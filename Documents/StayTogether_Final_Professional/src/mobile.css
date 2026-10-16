@@ -1,0 +1,136 @@
+@media (max-width: 600px) {
+  html {
+    min-width: 320px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  html,
+  body {
+    width: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+  }
+
+  #root {
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .appShell {
+    width: 100vw;
+    max-width: none;
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin: 0;
+    padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .topHeader {
+    padding: calc(9px + env(safe-area-inset-top, 0px)) 12px 9px;
+  }
+
+  .topHeader .logoMark {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 22px;
+  }
+
+  .brand h1 {
+    font-size: 19px;
+  }
+
+  .topActions {
+    gap: 4px;
+  }
+
+  .topActions .iconBtn {
+    width: 40px;
+    height: 40px;
+  }
+
+  main {
+    padding: 12px;
+  }
+
+  .card,
+  .authCard,
+  .profileHero,
+  .statBox,
+  .warningCard {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .bottomNav {
+    left: 0;
+    transform: none;
+    width: 100vw;
+    max-width: none;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 2px;
+    padding: 6px max(4px, env(safe-area-inset-right, 0px)) max(6px, env(safe-area-inset-bottom, 0px)) max(4px, env(safe-area-inset-left, 0px));
+  }
+
+  .bottomNav button {
+    min-width: 0;
+    min-height: 48px;
+    gap: 2px;
+    padding: 5px 1px;
+    color: var(--muted);
+    touch-action: manipulation;
+  }
+
+  .bottomNav button.active {
+    color: var(--blue);
+  }
+
+  .bottomNav button svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .bottomNav span {
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 9px;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .actionGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .actionGrid button {
+    min-width: 0;
+    min-height: 44px;
+    padding: 10px 8px;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 360px) {
+  main {
+    padding: 9px;
+  }
+
+  .bottomNav {
+    gap: 0;
+    padding-right: 3px;
+    padding-left: 3px;
+  }
+
+  .bottomNav button svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .bottomNav span {
+    font-size: 8px;
+  }
+}
