@@ -9,6 +9,7 @@
     width: 100%;
     min-height: 100%;
     overflow-x: hidden;
+    background: var(--bg);
   }
 
   #root {
@@ -23,22 +24,24 @@
     min-height: 100vh;
     min-height: 100dvh;
     margin: 0;
-    padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+    border-left: 0;
+    border-right: 0;
+    padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px));
   }
 
   .topHeader {
-    padding: calc(9px + env(safe-area-inset-top, 0px)) 12px 9px;
+    padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 10px;
   }
 
   .topHeader .logoMark {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    font-size: 22px;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    font-size: 17px;
   }
 
   .brand h1 {
-    font-size: 19px;
+    font-size: 16.5px;
   }
 
   .topActions {
@@ -46,21 +49,34 @@
   }
 
   .topActions .iconBtn {
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
   }
 
   main {
-    padding: 12px;
+    padding: 12px 14px;
   }
 
-  .card,
-  .authCard,
-  .profileHero,
-  .statBox,
-  .warningCard {
+  .authCard {
+    padding: 18px;
+    border-radius: 14px;
+  }
+
+  .heroSummaryCard {
     padding: 14px;
     border-radius: 14px;
+  }
+
+  .quickStats {
+    gap: 4px;
+  }
+
+  .quickStatTile {
+    padding: 6px 2px;
+  }
+
+  .profileInfoGrid {
+    grid-template-columns: 1fr;
   }
 
   .bottomNav {
@@ -70,20 +86,15 @@
     max-width: none;
     grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 2px;
-    padding: 6px max(4px, env(safe-area-inset-right, 0px)) max(6px, env(safe-area-inset-bottom, 0px)) max(4px, env(safe-area-inset-left, 0px));
+    padding: 5px max(6px, env(safe-area-inset-right, 0px)) max(5px, env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-left, 0px));
   }
 
   .bottomNav button {
     min-width: 0;
-    min-height: 48px;
+    min-height: 44px;
     gap: 2px;
-    padding: 5px 1px;
-    color: var(--muted);
+    padding: 4px 2px;
     touch-action: manipulation;
-  }
-
-  .bottomNav button.active {
-    color: var(--blue);
   }
 
   .bottomNav button svg {
@@ -94,29 +105,29 @@
   .bottomNav span {
     max-width: 100%;
     overflow: hidden;
-    font-size: 9px;
+    font-size: 9.5px;
     line-height: 1.2;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .actionGrid {
+  .navTileGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 7px;
+    gap: 8px;
   }
 
-  .actionGrid button {
-    min-width: 0;
-    min-height: 44px;
-    padding: 10px 8px;
-    font-size: 13px;
-    overflow-wrap: anywhere;
+  .navTile {
+    padding: 10px 11px;
   }
 }
 
 @media (max-width: 360px) {
   main {
-    padding: 9px;
+    padding: 10px 12px;
+  }
+
+  .navTileGrid {
+    grid-template-columns: 1fr;
   }
 
   .bottomNav {
@@ -131,6 +142,6 @@
   }
 
   .bottomNav span {
-    font-size: 8px;
+    font-size: 8.5px;
   }
 }

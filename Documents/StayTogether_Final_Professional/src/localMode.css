@@ -1,24 +1,32 @@
 .localModeBadge {
-  display: block;
-  margin-top: 3px;
-  color: #b45309;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: .03em;
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--subtle);
+  color: var(--muted);
+  font-size: 9.5px;
+  font-weight: 500;
 }
 
 .localDemoNotice {
   display: grid;
-  gap: 5px;
-  margin: 12px 0;
-  padding: 12px;
-  border: 1px solid #fcd34d;
-  border-radius: 12px;
-  background: #fffbeb;
-  color: #78350f;
+  gap: 3px;
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--subtle);
+  color: var(--text-secondary);
+  font-size: 12px;
   text-align: left;
 }
 
+.localDemoNotice b {
+  font-size: 12.5px;
+  color: var(--text);
+}
+
 .localDemoNotice small {
+  color: var(--muted);
   line-height: 1.4;
 }

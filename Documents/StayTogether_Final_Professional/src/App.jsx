@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
-  Activity, ArrowLeft, Bell, Bot, Briefcase, Camera, CheckCircle, Edit3,
-  Eye, EyeOff, Eye as EyeIcon, Home, KeyRound, LogOut, MessageCircle,
-  Moon, Network, Search, Send, Settings, ShieldCheck, Sparkles, Sun,
-  Trash2, UserCheck, UserPlus, UserRound, UsersRound, PlusCircle
+  Activity, ArrowLeft, Bell, Bot, Briefcase, Camera, CheckCircle, Compass, Edit3,
+  ExternalLink, Eye, EyeOff, Eye as EyeIcon, Home, KeyRound, LogOut, MessageCircle,
+  Moon, Network, Newspaper, PlusCircle, Search, Send, Settings, ShieldCheck,
+  Sparkles, Sun, Trash2, UserCheck, UserPlus, UserRound, UsersRound
 } from "lucide-react";
 const isLocalMode = import.meta.env.VITE_USE_LOCAL_BACKEND === "true" ||
   !import.meta.env.VITE_FIREBASE_API_KEY;
@@ -65,6 +65,42 @@ function PasswordRules({ password }) {
       {item(c.lower, "Lowercase")}
       {item(c.number, "Number")}
       {item(c.special, "Special character")}
+    </div>
+  );
+}
+
+const FIELD_LABELS = {
+  name: "Full Name",
+  headline: "Headline",
+  department: "Department",
+  dob: "Date of Birth",
+  registerNo: "Register Number",
+  percentage: "Percentage / CGPA",
+  skills: "Skills",
+  currentYear: "Current Year",
+  careerGoal: "Career Goal",
+  passedOutYear: "Passed Out Year",
+  company: "Company",
+  jobRole: "Job Role",
+  experience: "Experience",
+  designation: "Designation",
+  bio: "Bio / About Me"
+};
+
+function SkillTags({ skills, fallback }) {
+  const list = String(skills || "")
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean)
+    .slice(0, 5);
+  if (list.length === 0) {
+    return fallback ? <span className="roleBadge">{fallback}</span> : null;
+  }
+  return (
+    <div className="skillTags">
+      {list.map((skill, idx) => (
+        <span className="skillTag" key={`${skill}_${idx}`}>{skill}</span>
+      ))}
     </div>
   );
 }
@@ -555,19 +591,40 @@ function App() {
           <Logo />
           <div>
             <h1>StayTogether</h1>
-            <p>Resume • Network • Jobs</p>
-            {isLocalMode && <small className="localModeBadge">LOCAL TEST MODE · SAVED IN THIS BROWSER</small>}
+            <div className="brandMeta">
+              <p>Resume • Network • Jobs</p>
+              {isLocalMode && <small className="localModeBadge">Demo</small>}
+            </div>
           </div>
         </div>
 
         {user && (
           <div className="topActions">
-            <button className="iconBtn" onClick={() => setDark(!dark)}>{dark ? <Sun size={18} /> : <Moon size={18} />}</button>
-            <button className="iconBtn notificationBtn" onClick={() => setPage("notifications")}>
-              <Bell size={18} />
+            <button
+              className="iconBtn"
+              title={dark ? "Switch to light mode" : "Switch to dark mode"}
+              aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+              onClick={() => setDark(!dark)}
+            >
+              {dark ? <Sun size={17} /> : <Moon size={17} />}
+            </button>
+            <button
+              className="iconBtn notificationBtn"
+              title="Notifications"
+              aria-label="Notifications"
+              onClick={() => setPage("notifications")}
+            >
+              <Bell size={17} />
               {unreadNotes.length + unread > 0 && <span>{unreadNotes.length + unread}</span>}
             </button>
-            <button className="iconBtn" onClick={logout}><LogOut size={18} /></button>
+            <button
+              className="iconBtn"
+              title="Sign out"
+              aria-label="Sign out"
+              onClick={logout}
+            >
+              <LogOut size={17} />
+            </button>
           </div>
         )}
       </header>
@@ -604,9 +661,14 @@ function App() {
 
     return (
       <div className="loginPage">
-        <div className="loginHero"><Logo /><h1>StayTogether</h1><p>Students • Alumni • Staff</p></div>
+        <div className="loginHero">
+          <Logo />
+          <h1>StayTogether</h1>
+          <p>Professional campus network for Students, Alumni & Staff</p>
+        </div>
         <div className="authCard">
-          <h2>Welcome Back</h2>
+          <h2>Welcome back</h2>
+          <p className="authSub">Sign in to access your resume, network, and job board.</p>
           {isLocalMode && (
             <div className="localDemoNotice">
               <b>Local demo account</b>
@@ -616,15 +678,26 @@ function App() {
             </div>
           )}
           <form onSubmit={login}>
-            <input type="email" placeholder="Correct Email ID" value={form.email} onChange={e => setForm({ ...form, email: cleanEmail(e.target.value) })} />
-            <div className="passwordBox">
-              <input type={show ? "text" : "password"} placeholder="Password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
-              <button type="button" onClick={() => setShow(!show)}>{show ? <EyeOff size={17} /> : <Eye size={17} />}</button>
+            <div className="formField">
+              <label className="fieldLabel">Email Address</label>
+              <input type="email" placeholder="name@example.com" value={form.email} onChange={e => setForm({ ...form, email: cleanEmail(e.target.value) })} />
             </div>
-            <button>Login</button>
+            <div className="formField">
+              <label className="fieldLabel">Password</label>
+              <div className="passwordBox">
+                <input type={show ? "text" : "password"} placeholder="Enter password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
+                <button type="button" aria-label={show ? "Hide password" : "Show password"} onClick={() => setShow(!show)}>
+                  {show ? <EyeOff size={17} /> : <Eye size={17} />}
+                </button>
+              </div>
+            </div>
+            <button>Sign In</button>
           </form>
-          <button className="lightBtn" onClick={reset}><KeyRound size={16} /> Forgot Password</button>
-          <button className="lightBtn" onClick={() => setPage("register")}>Create Account</button>
+          <div className="authDivider">or</div>
+          <div className="authLinksRow">
+            <button type="button" className="lightBtn" onClick={reset}><KeyRound size={15} /> Forgot Password</button>
+            <button type="button" className="secondaryBlueBtn" onClick={() => setPage("register")}>Create Account</button>
+          </div>
         </div>
       </div>
     );
@@ -677,27 +750,50 @@ function App() {
 
     return (
       <div className="authCard registerCard">
+        <Back go={setPage} to="login" />
         <h2>Create Account</h2>
+        <p className="authSub">Build your StayTogether academic & career profile.</p>
         <form onSubmit={register}>
-          <select name="role" value={form.role} onChange={change}>
-            <option value="student">Student</option>
-            <option value="alumni">Alumni</option>
-            <option value="staff">Staff</option>
-          </select>
-          <input name="name" placeholder="Full Name" onChange={change} />
-          <input name="headline" placeholder="Headline e.g. BCA Student | Front-End Enthusiast" onChange={change} />
-          <input name="email" type="email" placeholder="Correct Email ID" value={form.email} onChange={e => setForm({ ...form, email: cleanEmail(e.target.value) })} />
-          <div className="passwordBox">
-            <input name="password" type={show ? "text" : "password"} placeholder="Strong Password" value={form.password} onChange={change} />
-            <button type="button" onClick={() => setShow(!show)}>{show ? <EyeOff size={17} /> : <Eye size={17} />}</button>
+          <div className="formField">
+            <label className="fieldLabel">Account Role</label>
+            <select name="role" value={form.role} onChange={change}>
+              <option value="student">Student</option>
+              <option value="alumni">Alumni</option>
+              <option value="staff">Staff</option>
+            </select>
+          </div>
+          <div className="formField">
+            <label className="fieldLabel">Full Name</label>
+            <input name="name" placeholder="Full Name" onChange={change} />
+          </div>
+          <div className="formField">
+            <label className="fieldLabel">Headline</label>
+            <input name="headline" placeholder="e.g. BCA Student | Front-End Enthusiast" onChange={change} />
+          </div>
+          <div className="formField">
+            <label className="fieldLabel">Email Address</label>
+            <input name="email" type="email" placeholder="name@example.com" value={form.email} onChange={e => setForm({ ...form, email: cleanEmail(e.target.value) })} />
+          </div>
+          <div className="formField">
+            <label className="fieldLabel">Password</label>
+            <div className="passwordBox">
+              <input name="password" type={show ? "text" : "password"} placeholder="Create a strong password" value={form.password} onChange={change} />
+              <button type="button" aria-label={show ? "Hide password" : "Show password"} onClick={() => setShow(!show)}>{show ? <EyeOff size={17} /> : <Eye size={17} />}</button>
+            </div>
           </div>
           <PasswordRules password={form.password} />
-          <input name="department" placeholder="Department" onChange={change} />
-          <input name="dob" type="date" value={form.dob} onChange={change} />
+          <div className="formField">
+            <label className="fieldLabel">Department</label>
+            <input name="department" placeholder="e.g. Computer Science" onChange={change} />
+          </div>
+          <div className="formField">
+            <label className="fieldLabel">Date of Birth</label>
+            <input name="dob" type="date" value={form.dob} onChange={change} />
+          </div>
           {(form.role === "student" || form.role === "alumni") && (
             <>
               <input name="registerNo" placeholder="Register Number" onChange={change} />
-              <input name="percentage" placeholder="Percentage" onChange={change} />
+              <input name="percentage" placeholder="Percentage / CGPA" onChange={change} />
             </>
           )}
           {form.role === "student" && (
@@ -715,33 +811,76 @@ function App() {
             </>
           )}
           {form.role === "staff" && <input name="designation" placeholder="Designation" onChange={change} />}
-          <input name="skills" placeholder="Skills" onChange={change} />
-          <textarea name="bio" placeholder="Bio/About Me" onChange={change} />
-          <button>Register</button>
+          <input name="skills" placeholder="Skills (comma-separated, e.g. React, Python)" onChange={change} />
+          <textarea name="bio" placeholder="Bio / About Me" onChange={change} />
+          <button>Create Account</button>
         </form>
-        <button className="lightBtn" onClick={() => setPage("login")}>Back</button>
       </div>
     );
   }
 
   function HomeDashboard() {
+    const activeJobsCount = data.jobs.filter(isActiveUntil).length;
+    const activePostsCount = data.posts.filter(isActiveUntil).length;
+    const navItems = [
+      { id: "feed", title: "Feed", sub: "Campus & alumni updates", icon: <Newspaper size={18} /> },
+      { id: "jobs", title: "Jobs Board", sub: "Openings & internships", icon: <Briefcase size={18} /> },
+      { id: "directory", title: "Directory", sub: "Students, alumni & staff", icon: <UsersRound size={18} /> },
+      { id: "messages", title: "Messages", sub: "Encrypted direct chat", icon: <MessageCircle size={18} />, count: unread },
+      { id: "network", title: "Friends", sub: "Requests & connections", icon: <Network size={18} /> },
+      { id: "profile", title: "My Profile", sub: "Resume & skills", icon: <UserRound size={18} /> },
+      { id: "createPost", title: "Create Post", sub: "Share an update", icon: <PlusCircle size={18} /> },
+      { id: "visitors", title: "Profile Visitors", sub: "Recent profile views", icon: <EyeIcon size={18} /> },
+      ...(profile?.role === "student" ? [{ id: "careerHub", title: "Career Hub", sub: "Guidance & tips", icon: <Compass size={18} /> }] : []),
+      { id: "bot", title: "StayBot", sub: "Quick feature guide", icon: <Bot size={18} /> },
+      { id: "settings", title: "Settings", sub: "Theme, alerts & privacy", icon: <Settings size={18} /> }
+    ];
+
     return (
-      <section className="card">
-        <h2>Dashboard</h2>
-        <p>Choose a section to continue.</p>
-        <div className="actionGrid">
-          <button onClick={() => setPage("profile")}>My Profile</button>
-          <button onClick={() => setPage("network")}>Friends</button>
-          <button onClick={() => setPage("directory")}>People Directory</button>
-          <button onClick={() => setPage("messages")}>Messages {unread ? `(${unread})` : ""}</button>
-          <button onClick={() => setPage("visitors")}>Profile Visitors</button>
-          <button onClick={() => setPage("createPost")}>Create Post</button>
-          <button onClick={() => setPage("jobs")}>Jobs</button>
-          <button onClick={() => setPage("feed")}>Feed</button>
-          <button onClick={() => setPage("settings")}>Settings</button>
-          {profile?.role === "student" && <button onClick={() => setPage("careerHub")}>Career Hub</button>}
+      <>
+        <section className="heroSummaryCard">
+          <div className="heroUserRow">
+            <Avatar u={profile} />
+            <div className="heroUserMeta">
+              <h2>{profile?.name || "Welcome"}</h2>
+              <p>{profile?.headline || (profile?.department ? `${profile.role} • ${profile.department}` : "Complete your profile to stand out")}</p>
+            </div>
+            {profile?.role && <span className="roleBadge">{profile.role}</span>}
+          </div>
+
+          <div className="quickStats">
+            <div className="quickStatTile" onClick={() => setPage("network")}>
+              <strong>{acceptedConnections.length}</strong>
+              <span>Friends</span>
+            </div>
+            <div className="quickStatTile" onClick={() => setPage("messages")}>
+              <strong>{unread}</strong>
+              <span>Unread</span>
+            </div>
+            <div className="quickStatTile" onClick={() => setPage("jobs")}>
+              <strong>{activeJobsCount}</strong>
+              <span>Jobs</span>
+            </div>
+            <div className="quickStatTile" onClick={() => setPage("feed")}>
+              <strong>{activePostsCount}</strong>
+              <span>Posts</span>
+            </div>
+          </div>
+        </section>
+
+        <p className="sectionHeading">Workspace</p>
+        <div className="navTileGrid">
+          {navItems.map(item => (
+            <button key={item.id} className="navTile" onClick={() => setPage(item.id)}>
+              <div className="tileIcon">{item.icon}</div>
+              <div className="navTileBody">
+                <span className="navTileTitle">{item.title}</span>
+                {item.count > 0 && <span className="tileCount">{item.count}</span>}
+              </div>
+            </button>
+          ))}
         </div>
-      </section>
+      </>
     );
   }
 
@@ -800,17 +939,22 @@ function App() {
         </div>
         <form onSubmit={save}>
           {fields.map(k => (
-            <input
-              key={k}
-              name={k}
-              type={k === "dob" ? "date" : "text"}
-              value={form[k] || ""}
-              placeholder={k === "dob" ? "Date of Birth" : k}
-              onChange={e => setForm({ ...form, [k]: e.target.value })}
-            />
+            <div className="formField" key={k}>
+              <label className="fieldLabel">{FIELD_LABELS[k] || k}</label>
+              <input
+                name={k}
+                type={k === "dob" ? "date" : "text"}
+                value={form[k] || ""}
+                placeholder={FIELD_LABELS[k] || k}
+                onChange={e => setForm({ ...form, [k]: e.target.value })}
+              />
+            </div>
           ))}
-          <textarea value={form.bio || ""} placeholder="bio" onChange={e => setForm({ ...form, bio: e.target.value })} />
-          <button>Save</button>
+          <div className="formField">
+            <label className="fieldLabel">{FIELD_LABELS.bio}</label>
+            <textarea value={form.bio || ""} placeholder="Tell classmates, alumni, and recruiters about yourself..." onChange={e => setForm({ ...form, bio: e.target.value })} />
+          </div>
+          <button>Save Profile</button>
         </form>
       </section>
     );
@@ -877,15 +1021,17 @@ function App() {
         <div className="miniProfile" key={u.uid}>
           <Avatar u={u} />
           <div className="miniProfileBody">
-            <h3 onClick={() => openProfile(u)}>{u.name} {u.online && <span className="dotOnline"></span>}</h3>
-            <p>{u.role} • {u.department}{u.company ? ` • ${u.company}` : ""}</p>
-            <span className="badge">{u.skills || u.company || u.designation || "Profile"}</span>
-            <p>{u.bio}</p>
-            <button className="smallBtn" onClick={() => openProfile(u)}><UserRound size={15} /> View Profile</button>
-            {u.uid !== user.uid && !c && <button className="smallBtn" onClick={() => sendConn(u)}><UserPlus size={15} /> Connect</button>}
-            {u.uid !== user.uid && c?.status === "pending" && <button className="smallBtn mutedBtn">Pending</button>}
-            {u.uid !== user.uid && c?.status === "accepted" && <button className="smallBtn successBtn"><UserCheck size={15} /> Connected</button>}
-            {u.uid !== user.uid && <button className="smallBtn" onClick={() => { setChatUser(u); setPage("personalChat"); }}><MessageCircle size={15} /> Message</button>}
+            <h3 onClick={() => openProfile(u)}>{u.name} {u.online && <span className="dotOnline" title="Online"></span>}</h3>
+            <p><span className="roleBadge">{u.role}</span> {u.department}{u.company ? ` • ${u.company}` : ""}</p>
+            <SkillTags skills={u.skills} fallback={u.company || u.designation} />
+            {u.bio && <p>{u.bio}</p>}
+            <div className="actionRow">
+              <button className="smallBtn lightBtn" onClick={() => openProfile(u)}><UserRound size={14} /> View Profile</button>
+              {u.uid !== user.uid && !c && <button className="smallBtn" onClick={() => sendConn(u)}><UserPlus size={14} /> Connect</button>}
+              {u.uid !== user.uid && c?.status === "pending" && <button className="smallBtn mutedBtn" disabled>Pending</button>}
+              {u.uid !== user.uid && c?.status === "accepted" && <button className="smallBtn successBtn"><UserCheck size={14} /> Connected</button>}
+              {u.uid !== user.uid && <button className="smallBtn secondaryBlueBtn" onClick={() => { setChatUser(u); setPage("personalChat"); }}><MessageCircle size={14} /> Message</button>}
+            </div>
           </div>
         </div>
       );
@@ -932,14 +1078,21 @@ function App() {
 
         <div className="profileInfoGrid">
           {["registerNo", "percentage", "dob", "company", "jobRole", "skills", "bio"].map(k => (k === "dob" || viewUser[k]) && (
-            <div key={k}><b>{k === "dob" ? "DOB" : k}</b><span>{k === "dob" ? formatDOB(viewUser[k]) : viewUser[k]}</span></div>
+            <div key={k} className={k === "skills" || k === "bio" ? "fullSpan" : ""}>
+              <b>{FIELD_LABELS[k] || k}</b>
+              <span>{k === "dob" ? formatDOB(viewUser[k]) : viewUser[k]}</span>
+            </div>
           ))}
         </div>
 
-        {viewUser.uid !== user.uid && !c && <button onClick={() => sendConn(viewUser)}><UserPlus size={15} /> Connect</button>}
-        {viewUser.uid !== user.uid && c?.status === "pending" && <button className="mutedBtn">Pending</button>}
-        {viewUser.uid !== user.uid && c?.status === "accepted" && <button className="successBtn"><UserCheck size={15} /> Connected</button>}
-        {viewUser.uid !== user.uid && <button onClick={() => { setChatUser(viewUser); setPage("personalChat"); }}>Message</button>}
+        {viewUser.uid !== user.uid && (
+          <div className="actionRow">
+            {!c && <button className="smallBtn" onClick={() => sendConn(viewUser)}><UserPlus size={15} /> Connect</button>}
+            {c?.status === "pending" && <button className="smallBtn mutedBtn" disabled>Request Pending</button>}
+            {c?.status === "accepted" && <button className="smallBtn successBtn"><UserCheck size={15} /> Connected</button>}
+            <button className="smallBtn secondaryBlueBtn" onClick={() => { setChatUser(viewUser); setPage("personalChat"); }}><MessageCircle size={15} /> Message</button>
+          </div>
+        )}
       </section>
     );
   }
@@ -1014,8 +1167,11 @@ function App() {
                   <Avatar u={otherUser || { name: otherName }} />
                   <div className="miniProfileBody">
                     <h3>{otherName}</h3>
-                    <p>{otherUser?.role || "Connected"} • {otherUser?.department || ""}</p>
-                    <button className="smallBtn" onClick={() => { if (otherUser) { setChatUser(otherUser); setPage("personalChat"); } }}>Message</button>
+                    <p><span className="roleBadge">{otherUser?.role || "Connected"}</span> {otherUser?.department || ""}</p>
+                    <div className="actionRow">
+                      {otherUser && <button className="smallBtn lightBtn" onClick={() => openProfile(otherUser)}><UserRound size={14} /> Profile</button>}
+                      <button className="smallBtn secondaryBlueBtn" onClick={() => { if (otherUser) { setChatUser(otherUser); setPage("personalChat"); } }}><MessageCircle size={14} /> Message</button>
+                    </div>
                   </div>
                 </div>
               );
@@ -1032,9 +1188,12 @@ function App() {
                 <Avatar u={u} />
                 <div className="miniProfileBody">
                   <h3>{u.name}</h3>
-                  <p>{u.role} • {u.department}</p>
-                  <p>{u.bio}</p>
-                  <button className="smallBtn" onClick={() => sendConn(u)}><UserPlus size={15} /> Connect</button>
+                  <p><span className="roleBadge">{u.role}</span> {u.department}</p>
+                  {u.bio && <p>{u.bio}</p>}
+                  <div className="actionRow">
+                    <button className="smallBtn lightBtn" onClick={() => openProfile(u)}><UserRound size={14} /> Profile</button>
+                    <button className="smallBtn" onClick={() => sendConn(u)}><UserPlus size={14} /> Connect</button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -1099,10 +1258,12 @@ function App() {
           <div className="miniProfile" key={u.uid}>
             <Avatar u={u} />
             <div className="miniProfileBody">
-              <h3>{u.name} {u.online && <span className="dotOnline"></span>}</h3>
-              <p>{u.role} • {u.department}{u.company ? ` • ${u.company}` : ""}</p>
-              {recentChats[u.uid] && <span className="badge">Recent chat</span>}
-              <button className="smallBtn" onClick={() => { setChatUser(u); setPage("personalChat"); }}>Open Chat</button>
+              <h3>{u.name} {u.online && <span className="dotOnline" title="Online"></span>}</h3>
+              <p><span className="roleBadge">{u.role}</span> {u.department}{u.company ? ` • ${u.company}` : ""}</p>
+              <div className="actionRow">
+                {recentChats[u.uid] && <span className="badge">Recent chat</span>}
+                <button className="smallBtn secondaryBlueBtn" onClick={() => { setChatUser(u); setPage("personalChat"); }}><MessageCircle size={14} /> Open Chat</button>
+              </div>
             </div>
           </div>
         ))}
@@ -1202,11 +1363,7 @@ function App() {
       <section className="card">
         <Back go={setPage} to="messages" />
         <h2>Chat with {chatUser.name}</h2>
-        <p>{chatUser.role} • {chatUser.department}</p>
-        <div className="privacyNote">🔒 End-to-end style encryption: message text is encrypted before saving to {isLocalMode ? "this browser" : "Firebase"}.</div>
-        <div className="chatSuggestion">
-          <b>Quick topic:</b> Internship, job opening, referral, interview tips, project guidance.
-        </div>
+        <p className="subtleCaption">{chatUser.role} • {chatUser.department} · 🔒 Encrypted · Ask about internships, referrals, or career tips</p>
         <div className="chatWindow">
           {msgs.map(m => (
             <div key={m.id} className={`chatBubble ${m.senderId === user.uid ? "me" : "other"}`}>
@@ -1289,21 +1446,27 @@ function App() {
     return (
       <section className="card">
         <Back go={setPage} />
-        <h2>Notifications</h2>
+        <h2><Bell size={18} /> Notifications</h2>
         <p>{unreadNotes.length} unread notification{unreadNotes.length === 1 ? "" : "s"}</p>
-        {notes.length > 0 && <button className="lightBtn" onClick={markAllRead}><CheckCircle size={16} /> Mark all as read</button>}
-        {displayNotes.length === 0 && <p>No notifications yet.</p>}
+        {notes.length > 0 && <button className="secondaryBlueBtn" onClick={markAllRead}><CheckCircle size={15} /> Mark all as read</button>}
+        {displayNotes.length === 0 && <p className="empty">No notifications yet.</p>}
         {displayNotes.map(n => (
           <div className={`notificationItem ${n.unreadCount > 0 ? "unreadNotice" : ""}`} key={n.id}>
-            <div onClick={() => openNotification(n)}>
+            <div className="noticeContent" onClick={() => openNotification(n)}>
               <b>{n.title}</b>
               {n.items.length > 1 && <span className="badge">{n.items.length} updates</span>}
               {n.unreadCount > 0 && <span className="badge">Unread</span>}
               <p>{n.text}</p>
             </div>
             <div className="noticeActions">
-              {n.unreadCount > 0 && <button className="deletePostBtn" onClick={() => markRead(n)}><CheckCircle size={15} /></button>}
-              <button className="deletePostBtn" onClick={() => del(n)}><Trash2 size={15} /></button>
+              {n.unreadCount > 0 && (
+                <button className="iconActionBtn" title="Mark as read" aria-label="Mark as read" onClick={() => markRead(n)}>
+                  <CheckCircle size={15} />
+                </button>
+              )}
+              <button className="deletePostBtn" title="Delete notification" aria-label="Delete notification" onClick={() => del(n)}>
+                <Trash2 size={15} />
+              </button>
             </div>
           </div>
         ))}
@@ -1333,19 +1496,28 @@ function App() {
     return (
       <section className="card">
         <Back go={setPage} />
-        <h2>Create Post</h2>
-        <p>Share achievements, ideas, opportunities or career updates.</p>
+        <h2><PlusCircle size={18} /> Create Post</h2>
+        <p>Share achievements, ideas, opportunities, or career updates.</p>
         <form onSubmit={submit}>
-          <textarea placeholder="Write your professional update..." onChange={e => setPost({ ...post, description: e.target.value })} />
-          <input placeholder="Video/link optional" onChange={e => setPost({ ...post, videoUrl: e.target.value })} />
-          <select value={post.expiryDays} onChange={e => setPost({ ...post, expiryDays: e.target.value })}>
-            <option value="1">Show for 1 day</option>
-            <option value="3">Show for 3 days</option>
-            <option value="7">Show for 7 days</option>
-            <option value="15">Show for 15 days</option>
-            <option value="30">Show for 30 days</option>
-          </select>
-          <button>Post</button>
+          <div className="formField">
+            <label className="fieldLabel">Update</label>
+            <textarea placeholder="Write your professional update..." onChange={e => setPost({ ...post, description: e.target.value })} />
+          </div>
+          <div className="formField">
+            <label className="fieldLabel">Reference Link (optional)</label>
+            <input placeholder="https://..." onChange={e => setPost({ ...post, videoUrl: e.target.value })} />
+          </div>
+          <div className="formField">
+            <label className="fieldLabel">Visibility Duration</label>
+            <select value={post.expiryDays} onChange={e => setPost({ ...post, expiryDays: e.target.value })}>
+              <option value="1">Show for 1 day</option>
+              <option value="3">Show for 3 days</option>
+              <option value="7">Show for 7 days</option>
+              <option value="15">Show for 15 days</option>
+              <option value="30">Show for 30 days</option>
+            </select>
+          </div>
+          <button>Publish Post</button>
         </form>
       </section>
     );
@@ -1354,23 +1526,50 @@ function App() {
   function FeedPage() {
     const posts = data.posts.filter(isActiveUntil).sort(sortNewestFirst);
     return (
-      <section className="card">
-        <Back go={setPage} />
-        <h2>Professional Feed</h2>
-        {posts.length === 0 && <p>No posts yet.</p>}
+      <>
+        <section className="card">
+          <Back go={setPage} />
+          <div className="pageTop">
+            <div>
+              <h2><Newspaper size={18} /> Professional Feed</h2>
+              <p>Latest updates from students, alumni, and staff.</p>
+            </div>
+            <button className="smallBtn secondaryBlueBtn" onClick={() => setPage("createPost")}><PlusCircle size={14} /> New Post</button>
+          </div>
+        </section>
+
+        {posts.length === 0 && <section className="card"><p className="empty">No posts yet.</p></section>}
         {posts.map(p => (
           <article className="postCard card" key={p.id}>
             <div className="postHeader">
               <Avatar u={data.users.find(u => u.uid === p.userId) || p} />
-              <div><h3>{p.name}</h3><p>{p.role} • {p.department}</p></div>
-              {(profile.role === "staff" || p.userId === user.uid) && <button className="deletePostBtn" onClick={async () => { await deleteDoc(doc(db, "posts", p.id)); await loadAll(); }}><Trash2 size={15} /></button>}
+              <div>
+                <h3>{p.name}</h3>
+                <p><span className="roleBadge">{p.role}</span> {p.department}</p>
+              </div>
+              {(profile.role === "staff" || p.userId === user.uid) && (
+                <button
+                  className="deletePostBtn"
+                  title="Delete post"
+                  aria-label="Delete post"
+                  onClick={async () => { await deleteDoc(doc(db, "posts", p.id)); await loadAll(); }}
+                >
+                  <Trash2 size={15} />
+                </button>
+              )}
             </div>
             <p className="postDescription">{p.description}</p>
-            {p.videoUrl && <a className="videoLink" href={p.videoUrl} target="_blank" rel="noreferrer">Open link</a>}
-            <small>Visible until {formatExpiry(p.expiresAt)}</small>
+            {p.videoUrl && (
+              <a className="videoLink" href={p.videoUrl} target="_blank" rel="noreferrer">
+                <ExternalLink size={14} /> Open link
+              </a>
+            )}
+            <div className="postFooter">
+              <span>Visible until {formatExpiry(p.expiresAt)}</span>
+            </div>
           </article>
         ))}
-      </section>
+      </>
     );
   }
 
@@ -1388,6 +1587,7 @@ function App() {
 
   function JobBoard() {
     const [job, setJob] = useState({ title: "", company: "", location: "", applyLink: "", description: "", expiryDays: "15" });
+    const [showJobForm, setShowJobForm] = useState(false);
 
     async function submitJob(e) {
       e.preventDefault();
@@ -1408,21 +1608,35 @@ function App() {
         createdAt: serverTimestamp()
       });
       setJob({ title: "", company: "", location: "", applyLink: "", description: "", expiryDays: "15" });
+      setShowJobForm(false);
       await loadAll();
     }
+
+    const activeJobs = data.jobs.filter(isActiveUntil).sort(sortNewestFirst);
 
     return (
       <section className="card">
         <Back go={setPage} />
-        <h2><Briefcase size={18} /> Jobs</h2>
-        {profile?.role !== "student" && (
+        <div className="pageTop">
+          <div>
+            <h2><Briefcase size={18} /> Jobs & Internships</h2>
+            <p>Verified opportunities shared by alumni and staff.</p>
+          </div>
+          {profile?.role !== "student" && (
+            <button className="smallBtn secondaryBlueBtn" onClick={() => setShowJobForm(!showJobForm)}>
+              <PlusCircle size={14} /> {showJobForm ? "Close" : "Post Job"}
+            </button>
+          )}
+        </div>
+
+        {profile?.role !== "student" && showJobForm && (
           <form className="jobForm" onSubmit={submitJob}>
             <h3>Post Job / Internship</h3>
             <input value={job.title} onChange={e => setJob({ ...job, title: e.target.value })} placeholder="Job Title" />
             <input value={job.company} onChange={e => setJob({ ...job, company: e.target.value })} placeholder="Company" />
-            <input value={job.location} onChange={e => setJob({ ...job, location: e.target.value })} placeholder="Location" />
+            <input value={job.location} onChange={e => setJob({ ...job, location: e.target.value })} placeholder="Location (e.g. Remote, Bengaluru)" />
             <input value={job.applyLink} onChange={e => setJob({ ...job, applyLink: e.target.value })} placeholder="Apply link / email" />
-            <textarea value={job.description} onChange={e => setJob({ ...job, description: e.target.value })} placeholder="Description" />
+            <textarea value={job.description} onChange={e => setJob({ ...job, description: e.target.value })} placeholder="Role summary & requirements" />
             <select value={job.expiryDays} onChange={e => setJob({ ...job, expiryDays: e.target.value })}>
               <option value="3">Show for 3 days</option>
               <option value="7">Show for 7 days</option>
@@ -1430,18 +1644,24 @@ function App() {
               <option value="30">Show for 30 days</option>
               <option value="60">Show for 60 days</option>
             </select>
-            <button><PlusCircle size={16} /> Post Job</button>
+            <button><PlusCircle size={15} /> Publish Job</button>
           </form>
         )}
 
-        {data.jobs.filter(isActiveUntil).length === 0 && <p>No active jobs posted yet.</p>}
-        {data.jobs.filter(isActiveUntil).sort(sortNewestFirst).map(j => (
+        {activeJobs.length === 0 && <p className="empty">No active jobs posted yet.</p>}
+        {activeJobs.map(j => (
           <div className="jobCard" key={j.id}>
             <h3>{j.title}</h3>
-            <p><b>{j.company}</b> • {j.location}</p>
+            <p className="jobMeta"><b>{j.company}</b> • {j.location}</p>
             <p>{j.description}</p>
-            {j.applyLink && <a href={j.applyLink} target="_blank" rel="noreferrer">Apply / Contact</a>}
-            <small>Posted by {j.postedBy} • Visible until {formatExpiry(j.expiresAt)}</small>
+            <div className="jobFooter">
+              <small>Posted by {j.postedBy} • Until {formatExpiry(j.expiresAt)}</small>
+              {j.applyLink && (
+                <a className="applyBtn" href={j.applyLink} target="_blank" rel="noreferrer">
+                  <ExternalLink size={13} /> Apply / Contact
+                </a>
+              )}
+            </div>
           </div>
         ))}
       </section>
@@ -1456,19 +1676,23 @@ function App() {
         <div className="settingsBlock">
           <h3>Account Preference</h3>
           <p>Manage profile and role correction.</p>
-          <button onClick={() => setPage("roleChange")}>Change Student / Alumni Role</button>
+          <button className="lightBtn" onClick={() => setPage("roleChange")}>Change Student / Alumni Role</button>
         </div>
         <div className="settingsBlock">
-          <h3>Dark Mode</h3>
-          <button onClick={() => setDark(!dark)}>{dark ? "Light Mode" : "Dark Mode"}</button>
+          <h3>Appearance</h3>
+          <p>Switch between light and dark workspace themes.</p>
+          <button className="lightBtn" onClick={() => setDark(!dark)}>
+            {dark ? <Sun size={15} /> : <Moon size={15} />}
+            {dark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          </button>
         </div>
         <div className="settingsBlock">
           <h3>Push Notification</h3>
-          <p>Free notification foundation added. This enables phone/browser permission and shows new-message alerts while the app is open.</p>
-          <button onClick={async () => {
+          <p>Enables browser permission and shows new-message alerts while the app is open.</p>
+          <button className="secondaryBlueBtn" onClick={async () => {
             const ok = await enableLocalNotifications();
             alert(ok ? "Notification enabled" : "Notification permission not enabled");
-          }}>Enable Notification</button>
+          }}><Bell size={15} /> Enable Notification</button>
           <p><small>For background push when app is closed, connect Firebase Cloud Messaging with a VAPID key / Cloud Function later.</small></p>
         </div>
         <div className="settingsBlock">
@@ -1489,7 +1713,10 @@ function App() {
           <p><b>Gowtham N</b> — Storage Manager</p>
           <p>StayTogether is a professional network for profile, connections, jobs and career conversations.</p>
         </div>
-        <button onClick={() => setPage("help")}>Help Center</button>
+        <div className="actionRow">
+          <button className="smallBtn lightBtn" onClick={() => setPage("help")}>Help Center</button>
+          <button className="smallBtn secondaryBlueBtn" onClick={() => setPage("bot")}><Bot size={14} /> Ask StayBot</button>
+        </div>
       </section>
     );
   }
@@ -1504,6 +1731,7 @@ function App() {
         <div className="helpItem"><h3>Connections</h3><p>Connect with classmates, teachers, alumni and professionals.</p></div>
         <div className="helpItem"><h3>Messages</h3><p>Anyone can message anyone. Students can ask alumni about internships, jobs and career guidance.</p></div>
         <div className="helpItem"><h3>Jobs</h3><p>Alumni and staff can post opportunities. Students can view and apply.</p></div>
+        <button className="secondaryBlueBtn" onClick={() => setPage("bot")}><Bot size={15} /> Open StayBot Assistant</button>
       </section>
     );
   }
@@ -1528,14 +1756,14 @@ function App() {
     return (
       <section className="card">
         <Back go={setPage} />
-        <h2><Bot /> StayBot</h2>
+        <h2><Bot size={18} /> StayBot</h2>
         <div className="botArea">
           {messages.map((m, i) => <div key={i} className={`bubble ${m.from}`}>{m.text}</div>)}
         </div>
-        <div className="chatInput">
+        <form className="chatInput" onSubmit={e => { e.preventDefault(); if (input.trim()) reply(input); }}>
           <input value={input} onChange={e => setInput(e.target.value)} placeholder="Ask StayBot..." />
-          <button onClick={() => input.trim() && reply(input)}><Send size={16} /></button>
-        </div>
+          <button type="submit"><Send size={16} /></button>
+        </form>
       </section>
     );
   }
